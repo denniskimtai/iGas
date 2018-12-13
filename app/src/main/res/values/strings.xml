@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">iGas</string>
+
+    <string name="title_1">Gas Refill</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="back_to_login"><![CDATA[<< Back to login]]></string>
+    <string name="password">Password</string>
+    <string name="terms_and_conditions">Agree to all the terms and condtions</string>
+    <string name="sign_up">SIGN Up</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="have_an_account_sign_in">Already a member? Login</string>
+    <string name="last_name">Last Name</string>
+    <string name="email">Email</string>
+    <string name="first_name">First Name</string>
+    <string name="username">Username</string>
+    <string name="name">Full Name</string>
+    <string name="phone">Phone Number</string>
+    <string name="forgot_your_password">Forgot Your Password?</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="don_t_have_an_account_sign_up">No account yet? Create one</string>
+    <string name="location">Location</string>
+    <string name="estate">Estate</string>
+    <string name="title_2">New Gas</string>
+    <string name="title_3">Gas Equipments</string>
+    <string name="title_4">Ugly card</string>
+    <string name="text_1">Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Etiam eget ligula eu lectus lobortis condimentum.</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="nav_header_title">Welcome Dennis</string>
+    <string name="nav_header_subtitle">denniskimtai1@gmail.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

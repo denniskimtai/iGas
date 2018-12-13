@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="60dp"
+        android:clipToPadding="false"
+        android:orientation="vertical">
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="19.3dp"
+            android:paddingTop="22.1dp"
+            android:paddingBottom="18.7dp"
+            android:paddingLeft="19.2dp"
+            android:paddingRight="19.2dp"
+            android:background="@drawable/white_rect">
+
+
+            <customfonts.TextViewSFProDisplayRegular
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your Selection"
+                android:textSize="15.3sp"
+                android:textColor="#6e7f8d"/>
+
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/gas"
+                android:layout_gravity="center"/>
+
+
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/white_rect"
+            android:padding="28.8dp"
+            android:layout_marginLeft="19.3dp"
+            android:layout_marginRight="19.3dp">
+
+                <customfonts.TextViewSFProDisplaySemibold
+                    android:id="@+id/send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Categories"
+                    android:textColor="@color/light_gray"/>
+
+                <customfonts.EditText_SF_Pro_Display_Regular
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#00000000"
+                    android:hint="Cylinder + Equipments"
+                    android:textColor="@color/txt_color"
+                    android:layout_marginTop="8dp"
+                    android:textSize="17.3sp"
+                    android:inputType="text"
+                    android:textColorHint="@color/light_gray"/>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="#eff0f4"/>
+
+
+
+            <customfonts.TextViewSFProDisplayRegular
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="Select Gas Type"
+                android:layout_marginTop="28.7dp"
+                android:textColor="@color/light_gray"/>
+
+
+            <customfonts.EditText_SF_Pro_Display_Regular
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:hint="K-GAS"
+                android:textColor="@color/txt_color"
+                android:layout_marginTop="8dp"
+                android:textSize="17.3sp"
+                android:inputType="text"
+                android:textColorHint="@color/light_gray"/>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="#eff0f4"/>
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <customfonts.TextViewSFProDisplayRegular
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:text="Select Gas Size"
+                        android:layout_marginTop="20dp"
+                        android:textColor="@color/light_gray"/>
+
+
+                    <customfonts.EditText_SF_Pro_Display_Regular
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:hint="0.5241"
+                        android:textColor="@color/txt_color"
+                        android:layout_marginTop="8dp"
+                        android:textSize="17.3sp"
+                        android:inputType="text"
+                        android:textColorHint="@color/txt_color"/>
+
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="5dp"
+                        android:background="#eff0f4"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <customfonts.Button_SF_Pro_Display_Semibold
+        android:id="@+id/bottom_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/blue_rect"
+        android:textColor="#fbfbfb"
+        android:textAllCaps="false"
+        android:layout_gravity="bottom"
+        android:layout_marginTop="10dp"
+        android:text="Order Now"/>
+</android.support.design.widget.CoordinatorLayout>
