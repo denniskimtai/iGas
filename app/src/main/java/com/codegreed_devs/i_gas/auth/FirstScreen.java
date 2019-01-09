@@ -7,6 +7,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.codegreed_devs.i_gas.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 
 public class FirstScreen extends AppCompatActivity {
 
@@ -24,6 +28,7 @@ public class FirstScreen extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent login = new Intent(FirstScreen.this, LoginActivity.class);
                 startActivity(login);
                 finish();

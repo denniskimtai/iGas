@@ -46,7 +46,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/logo2" />
 
             <EditText
-                android:id="@+id/email"
+                android:id="@+id/regEmail"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="15dp"
@@ -67,9 +67,9 @@
                 android:drawableLeft="@drawable/person_black_24dp"
                 android:hint="@string/phone"
                 android:inputType="phone"
-                app:layout_constraintEnd_toEndOf="@+id/email"
-                app:layout_constraintStart_toStartOf="@+id/email"
-                app:layout_constraintTop_toBottomOf="@+id/email" />
+                app:layout_constraintEnd_toEndOf="@+id/regEmail"
+                app:layout_constraintStart_toStartOf="@+id/regEmail"
+                app:layout_constraintTop_toBottomOf="@+id/regEmail" />
 
             <EditText
                 android:id="@+id/location"
@@ -112,14 +112,28 @@
                 app:layout_constraintStart_toStartOf="@+id/location"
                 app:layout_constraintTop_toBottomOf="@+id/location" />
 
+            <EditText
+                android:id="@+id/reg_confirm_password"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:drawableStart="@drawable/lock_outline_black_24dp"
+                android:drawableLeft="@drawable/lock_outline_black_24dp"
+                android:drawablePadding="4dp"
+                android:hint="@string/confirm_password"
+                android:inputType="textPassword"
+                app:layout_constraintEnd_toEndOf="@+id/reg_password"
+                app:layout_constraintStart_toStartOf="@+id/reg_password"
+                app:layout_constraintTop_toBottomOf="@+id/reg_password" />
+
             <android.support.v7.widget.AppCompatCheckBox
                 android:id="@+id/checkboxTerms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/terms_and_conditions"
-                app:layout_constraintBottom_toTopOf="@+id/reg_password"
-                app:layout_constraintStart_toStartOf="@+id/reg_password"
-                app:layout_constraintTop_toBottomOf="@+id/reg_password"
+                app:layout_constraintBottom_toTopOf="@+id/reg_confirm_password"
+                app:layout_constraintStart_toStartOf="@+id/reg_confirm_password"
+                app:layout_constraintTop_toBottomOf="@+id/reg_confirm_password"
                 app:layout_constraintVertical_bias="0" />
 
             <Button
@@ -146,7 +160,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/checkboxTerms" />
 
             <TextView
-                android:id="@+id/sign_in"
+                android:id="@+id/alreadyMember"
                 android:layout_width="wrap_content"
                 android:layout_height="26dp"
                 android:layout_marginStart="8dp"

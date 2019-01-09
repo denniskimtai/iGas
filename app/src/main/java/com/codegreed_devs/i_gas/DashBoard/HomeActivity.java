@@ -1,5 +1,7 @@
 package com.codegreed_devs.i_gas.DashBoard;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.codegreed_devs.i_gas.R;
+import com.codegreed_devs.i_gas.auth.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -110,7 +114,44 @@ public class HomeActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_aboutus:
-                fragment = new AboutUs();
+                Intent aboutUs = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/1F1x0oG0BgIVO1gROhI3vMpdEnBz0syu2/view?usp=sharing"));
+                startActivity(aboutUs);
+                break;
+
+            case R.id.nav_share:
+                Intent navShare = new Intent(Intent.ACTION_SEND);
+                navShare.setType("text/plain");
+                String shareMessage = "Google PlayStore link";
+                navShare.putExtra(Intent.EXTRA_SUBJECT, "Follow this link to download iGas app");
+                navShare.putExtra(Intent.EXTRA_TEXT, shareMessage);
+                startActivity(Intent.createChooser(navShare, "Share Via"));
+                break;
+
+            case R.id.nav_rateus:
+                Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
+                startActivity(rateIntent);
+                break;
+
+            case R.id.nav_faqs:
+                Intent faqs = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/1vqpfn1_vGo93JH8mv7b5GNQF_LYPtHJR/view?usp=sharing"));
+                startActivity(faqs);
+                break;
+
+            case R.id.nav_terms:
+                Intent terms = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/1vqpfn1_vGo93JH8mv7b5GNQF_LYPtHJR/view?usp=sharing"));
+                startActivity(terms);
+                break;
+
+            case R.id.nav_privacy_policy:
+                Intent privacy = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/1vqpfn1_vGo93JH8mv7b5GNQF_LYPtHJR/view?usp=sharing"));
+                startActivity(privacy);
+                break;
+
+            case R.id.nav_logout:
+                FirebaseAuth.getInstance().signOut();
+                Intent intent  = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
                 break;
         }
 

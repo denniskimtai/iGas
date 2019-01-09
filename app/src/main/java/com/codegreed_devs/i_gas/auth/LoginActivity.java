@@ -1,32 +1,135 @@
 package com.codegreed_devs.i_gas.auth;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codegreed_devs.i_gas.DashBoard.HomeActivity;
 import com.codegreed_devs.i_gas.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity {
-    private static final String EMAIL = "email";
-    TextView register, loginPassword;
-    Button sign_in_btn;
-    CheckBox checkBoxShowPassword;
+
+    private TextView noAccount;
+    private EditText loginEmail, loginPassword;
+    private Button sign_in_btn;
+    private CheckBox checkBoxShowPassword;
+    private ProgressDialog progressDialog;
+
+    //Define firebaseauth object
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        loginEmail = findViewById(R.id.login_email);
+        sign_in_btn = findViewById(R.id.sign_in_btn);
         loginPassword = findViewById(R.id.login_password);
         checkBoxShowPassword = findViewById(R.id.checkboxShowPassword);
+        progressDialog = new ProgressDialog(this);
+        noAccount = findViewById(R.id.noAccount);
+
+        //Show password if user chooses
+        showPassword();
+
+        //Initialize firebase auth
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        //Check is user is already logged in
+        if (firebaseAuth.getCurrentUser() != null) {
+            //user is already logged in go to homeActivity
+            finish();
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+
+        }
+
+        sign_in_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginUser();
+
+            }
+        });
+
+        noAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =  new Intent(LoginActivity.this, RegistrationActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        loginUser();
+
+
+    }
+
+    //Check credentials to login
+    private void loginUser(){
+
+        //Get email and password from user
+        String email = loginEmail.getText().toString().trim();
+        String password = loginPassword.getText().toString().trim();
+
+        //Check if email and password is empty
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(this, "Please Enter email address", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(password)){
+            Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //Display progress dialog
+        progressDialog.setMessage("Signing in Please wait...");
+
+        //login user
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressDialog.dismiss();
+
+                        //Check if task is successful or not
+                        if (task.isSuccessful()){
+
+                            //Start profile activity
+                            finish();
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            startActivity(intent);
+                        }
+                    }
+                });
+
+
+
+    }
+
+    private void showPassword(){
+
         checkBoxShowPassword.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -38,36 +141,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        register = findViewById(R.id.register);
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToRegisterActivity();
-            }
-        });
-
-        sign_in_btn = findViewById(R.id.sign_in_btn);
-        sign_in_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToMainActivity();
-            }
-        });
-
     }
 
-    public void goToMainActivity() {
-        Intent mainActivity = new Intent(LoginActivity.this, HomeActivity.class);
-        mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(mainActivity);
-        finish();
-    }
 
-    private void goToRegisterActivity() {
-        Intent registerIntent = new Intent(LoginActivity.this, RegistrationActivity.class);
-        registerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(registerIntent);
-        finish();
-    }
 
 }

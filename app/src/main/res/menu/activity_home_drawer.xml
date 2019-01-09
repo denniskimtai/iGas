@@ -16,6 +16,21 @@
             android:id="@+id/nav_orderhistory"
             android:icon="@drawable/orderhistoryicon"
             android:title="Order History" />
+
+        <item
+            android:id="@+id/nav_privacy_policy"
+            android:icon="@drawable/privacypolicy"
+            android:title="Privacy Policy" />
+
+        <item
+            android:id="@+id/nav_faqs"
+            android:icon="@drawable/faqs"
+            android:title="FAQS" />
+
+        <item
+            android:id="@+id/nav_terms"
+            android:icon="@drawable/terms"
+            android:title="Terms and Conditions" />
     </group>
 
     <item android:title="Communicate">
@@ -38,5 +53,10 @@
                 android:title="About Us" />
         </menu>
     </item>
+
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/aboutusicon"
+        android:title="Log Out" />
 
 </menu>

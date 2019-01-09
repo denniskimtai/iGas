@@ -1,5 +1,7 @@
 package com.codegreed_devs.i_gas.DashBoard;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,5 +26,8 @@ public class AboutUs extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //Set title of toolbar
         getActivity().setTitle("About Us");
+
+        Intent drive = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/1F1x0oG0BgIVO1gROhI3vMpdEnBz0syu2/view?usp=sharing"));
+        startActivity(drive);
     }
 }
