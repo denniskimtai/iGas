@@ -94,12 +94,12 @@ public class LoginActivity extends AppCompatActivity {
 
         //Check if email and password is empty
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Please Enter email address", Toast.LENGTH_SHORT).show();
+            loginEmail.setError("Enter Email Address");
             return;
         }
 
         if (TextUtils.isEmpty(password)){
-            Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+            loginEmail.setError("Enter Password");
             return;
         }
 
