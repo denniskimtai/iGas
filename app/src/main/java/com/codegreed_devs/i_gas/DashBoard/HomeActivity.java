@@ -16,13 +16,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.codegreed_devs.i_gas.R;
 import com.codegreed_devs.i_gas.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private TextView userName, userEmail;
+    private ImageView userProfilePhoto;
+    private Uri photoUrl;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +40,15 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        String mUserName = mAuth.getCurrentUser().getDisplayName();
+        String mUserEmail = mAuth.getCurrentUser().getEmail();
+        photoUrl = mAuth.getCurrentUser().getPhotoUrl();
+
+
+
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -46,8 +65,23 @@ public class HomeActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        userName = navigationView.getHeaderView(0).findViewById(R.id.userName);
+        userEmail = navigationView.getHeaderView(0).findViewById(R.id.userEmail);
+        userProfilePhoto = navigationView.getHeaderView(0).findViewById(R.id.userProfilePhoto);
+
+
+        userName.setText("Welcome" + mUserName);
+        userEmail.setText(mUserEmail);
+
+        Picasso.get()
+                .load(photoUrl)
+                .placeholder(R.drawable.userimg)
+                .resize(100, 100)
+                .centerCrop()
+                .into(userProfilePhoto);
 
         //Display home screen as the first screen when its loaded
         displaySelectedScreen(R.id.nav_home);
