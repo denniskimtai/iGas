@@ -1,7 +1,9 @@
 package com.codegreed_devs.i_gas.auth;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codegreed_devs.i_gas.BuildConfig;
 import com.codegreed_devs.i_gas.DashBoard.Home;
 import com.codegreed_devs.i_gas.DashBoard.HomeActivity;
 import com.codegreed_devs.i_gas.R;
@@ -26,8 +29,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class RegistrationActivity extends AppCompatActivity {
+    private static final String TAG = "FCMToken";
+    private DatabaseReference mDatabaseRef;
+    private SharedPreferences sharedPref;
     private Button signupButton;
     private CheckBox checkBoxTerms;
     private EditText regPassword, confirm_password, regEmail, regFullName, regPhoneNumber, regLocation;
@@ -42,6 +50,9 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        sharedPref = getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID + "SHARED_PREF", Context.MODE_PRIVATE);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
         //Initialize objects
         regEmail = findViewById(R.id.regEmail);
@@ -115,7 +126,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
 
                             //Write to database
-                            String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            final String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                             DatabaseReference regActivityRef = FirebaseDatabase.getInstance().getReference("clients");
                             RegistrationActivityClass registrationActivity = new RegistrationActivityClass(clientId,mFullName,mEmail,mPhoneNumber,mLocation);
@@ -125,6 +136,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful())
                                     {
+                                        sendFCMTokenToDatabase(clientId);
                                         Toast.makeText(RegistrationActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
                                         startActivity(intent);
@@ -197,4 +209,23 @@ public class RegistrationActivity extends AppCompatActivity {
         return true;
     }
 
+    private void sendFCMTokenToDatabase(final String clientId) {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (!task.isSuccessful()) {
+                    Log.e(TAG, "Couldn't get the FCM token");
+                }
+
+                String token = task.getResult().getToken();
+                mDatabaseRef.child("clients").child(clientId).child("fcm_token").setValue(token).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        progressDialog.dismiss();
+                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    }
+                });
+            }
+        });
+    }
 }
