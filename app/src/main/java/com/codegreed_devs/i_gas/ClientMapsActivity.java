@@ -48,7 +48,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
     Location mLastLocation;
     LocationRequest mLocationRequest;
     private Button orderButton;
-    private  LatLng deliveryLocation;
+    private LatLng deliveryLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +85,6 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                 deliveryLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
                 getClosestvendor();
-
-
 
             }
         });

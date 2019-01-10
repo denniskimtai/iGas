@@ -1,13 +1,16 @@
 package com.codegreed_devs.i_gas.auth;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -16,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codegreed_devs.i_gas.BuildConfig;
 import com.codegreed_devs.i_gas.DashBoard.Home;
 import com.codegreed_devs.i_gas.DashBoard.HomeActivity;
 import com.codegreed_devs.i_gas.R;
@@ -25,13 +29,19 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class RegistrationActivity extends AppCompatActivity {
+    private static final String TAG = "FCMToken";
+    private DatabaseReference mDatabaseRef;
+    private SharedPreferences sharedPref;
     private Button signupButton;
     private CheckBox checkBoxTerms;
     private EditText regPassword, confirm_password, regEmail, regFullName, regPhoneNumber, regLocation;
     private TextView alreadyMember;
     private ProgressDialog progressDialog;
+    private String mFullName, mEmail, mPhoneNumber, mLocation, mPassword, mConfirmPassword;
 
     //Firebase object
     private FirebaseAuth firebaseAuth;
@@ -41,12 +51,16 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
+        sharedPref = getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID + "SHARED_PREF", Context.MODE_PRIVATE);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+
         //Initialize objects
-        regPassword = findViewById(R.id.reg_password);
         regEmail = findViewById(R.id.regEmail);
         regFullName = findViewById(R.id.name);
         regPhoneNumber = findViewById(R.id.phone);
         regLocation = findViewById(R.id.location);
+        regPassword = findViewById(R.id.reg_password);
+        confirm_password = findViewById(R.id.reg_confirm_password);
         signupButton = findViewById(R.id.signupButton);
         progressDialog = new ProgressDialog(this);
 
@@ -80,8 +94,8 @@ public class RegistrationActivity extends AppCompatActivity {
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmPassword();
-                registerUser();
+                if (validate())
+                    registerUser();
             }
         });
 
@@ -99,57 +113,44 @@ public class RegistrationActivity extends AppCompatActivity {
     //Firebase authentication to register new users
     private void registerUser(){
 
-        //get email and password
-        final String Email = regEmail.getText().toString().trim();
-        String Password = regPassword.getText().toString().trim();
-
-        //Check if emails are empty
-        if (TextUtils.isEmpty(Email)) {
-            Toast.makeText(RegistrationActivity.this, "Email cannot be empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (TextUtils.isEmpty(Password)) {
-
-            Toast.makeText(RegistrationActivity.this, "Password field cannot be empty ", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         progressDialog.setMessage("Registering Please Wait...");
         progressDialog.show();
 
         //Create new user
-        firebaseAuth.createUserWithEmailAndPassword(Email, Password)
+        firebaseAuth.createUserWithEmailAndPassword(mEmail, mPassword)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         //Check if registering was successful
                         if (task.isSuccessful()) {
 
-                            progressDialog.dismiss();
-
-                            Toast.makeText(RegistrationActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-
-                            String mFullName = regFullName.getText().toString().trim();
-                            String mEmail = regEmail.getText().toString().trim();
-                            String mPhoneNumber = regPhoneNumber.getText().toString().trim();
-                            String mLocation = regLocation.getText().toString().trim();
-
                             //Write to database
-                            String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                            DatabaseReference regActivityRef = FirebaseDatabase.getInstance().getReference("Client Registration Details");
-                            RegistrationActivityClass registrationActivity = new RegistrationActivityClass(mFullName,mEmail,mPhoneNumber,mLocation);
-                            regActivityRef.child(clientId).setValue(registrationActivity);
+                            final String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                            Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
-                            startActivity(intent);
+                            DatabaseReference regActivityRef = FirebaseDatabase.getInstance().getReference("clients");
+                            RegistrationActivityClass registrationActivity = new RegistrationActivityClass(clientId,mFullName,mEmail,mPhoneNumber,mLocation);
 
-
+                            regActivityRef.child(clientId).setValue(registrationActivity).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful())
+                                    {
+                                        sendFCMTokenToDatabase(clientId);
+                                        Toast.makeText(RegistrationActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+                                    }
+                                    else if (task.getException() != null)
+                                    {
+                                        Log.e("DATABASE ERROR", task.getException().getMessage());
+                                    }
+                                    progressDialog.dismiss();
+                                }
+                            });
 
                         } else {
                             progressDialog.dismiss();
                             Toast.makeText(RegistrationActivity.this, "Registration failed! Please check your internet connection or password and try again", Toast.LENGTH_SHORT).show();
-                            return;
                         }
 
 
@@ -159,18 +160,71 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
 
-    private void confirmPassword() {
+    private boolean validate() {
 
-        regPassword = findViewById(R.id.reg_password);
-        confirm_password = findViewById(R.id.reg_confirm_password);
+        mFullName = regFullName.getText().toString().trim();
+        mEmail = regEmail.getText().toString().trim();
+        mPhoneNumber = regPhoneNumber.getText().toString().trim();
+        mLocation = regLocation.getText().toString().trim();
+        mPassword = regPassword.getText().toString().trim();
+        mConfirmPassword = confirm_password.getText().toString().trim();
 
-        if (!regPassword.equals(confirm_password)){
-            Toast.makeText(this, "Password does not match try again", Toast.LENGTH_SHORT).show();
-            signupButton.setEnabled(false
-            );
-            return;
-
+        if (mFullName.isEmpty())
+        {
+            regFullName.setError("Enter full names!");
+            return false;
         }
+        else if (mEmail.isEmpty())
+        {
+            regEmail.setError("Enter valid email!");
+            return false;
+        }
+        else if (mPhoneNumber.isEmpty())
+        {
+            regFullName.setError("Enter valid phone number!");
+            return false;
+        }
+        else if (mLocation.isEmpty())
+        {
+            regFullName.setError("Enter location!");
+            return false;
+        }
+        else if (mPassword.isEmpty())
+        {
+            regFullName.setError("Enter password!");
+            return false;
+        }
+        else if (mPassword.length() < 6)
+        {
+            regFullName.setError("Password must be 6 characters or more!");
+            return false;
+        }
+        else if (!mConfirmPassword.equals(mPassword))
+        {
+            confirm_password.setError("Passwords don't match");
+            return false;
+        }
+
+        return true;
     }
 
+    private void sendFCMTokenToDatabase(final String clientId) {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (!task.isSuccessful()) {
+                    Log.e(TAG, "Couldn't get the FCM token");
+                }
+
+                String token = task.getResult().getToken();
+                mDatabaseRef.child("clients").child(clientId).child("fcm_token").setValue(token).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        progressDialog.dismiss();
+                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    }
+                });
+            }
+        });
+    }
 }

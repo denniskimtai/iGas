@@ -41,7 +41,6 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
-
         mnumberOfCylinders = findViewById(R.id.numberOfCylinders);
         mGasBrand = findViewById(R.id.gasBrand);
 
@@ -115,7 +114,6 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
             case R.id.gas3kg:
                 if (isChecked) {
                     gasSize = "3kg gas cylinder";
-
                 }
                 break;
 
@@ -149,8 +147,6 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
                 break;
 
         }
-
-
 
     }
 
