@@ -79,7 +79,6 @@ public class Home extends Fragment {
                 checkBoxGasBurner.setText("Gas Burner");
                 checkBoxGasGrill.setText("Gas Grill");
 
-
                 checkBoxGasBurner.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -112,7 +111,7 @@ public class Home extends Fragment {
                     }
                 });
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Choose Gas Equipments You Need")
                         .setView(checkBoxView)
                         .setCancelable(false)
