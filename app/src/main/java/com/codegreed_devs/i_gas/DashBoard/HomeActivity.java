@@ -1,5 +1,7 @@
 package com.codegreed_devs.i_gas.DashBoard;
 
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codegreed_devs.i_gas.R;
 import com.codegreed_devs.i_gas.auth.LoginActivity;
@@ -181,6 +185,10 @@ public class HomeActivity extends AppCompatActivity
                 startActivity(privacy);
                 break;
 
+            case R.id.nav_contactus:
+                alertDialog();
+                break;
+
             case R.id.nav_logout:
                 FirebaseAuth.getInstance().signOut();
                 Intent intent  = new Intent(HomeActivity.this, LoginActivity.class);
@@ -196,7 +204,58 @@ public class HomeActivity extends AppCompatActivity
             ft.commit();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    public void alertDialog() {
+
+        final  CharSequence[] contactUsOptions = {"Call", "Sms", "Email"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("How do you wish to contact us?");
+        builder.setItems(contactUsOptions, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                switch (which) {
+
+                    case 0:
+                        //Place a call
+                        Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
+                        phoneIntent.setData(Uri.parse("tel:+254710265413"));
+                        startActivity(phoneIntent);
+
+                        break;
+
+                    case 1:
+
+                        //Send an sms
+                        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                        sendIntent.setData(Uri.parse("sms:" + "+254710265413"));
+                        startActivity(sendIntent);
+
+                        break;
+
+                    case 2:
+
+                        //Send email
+                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                        emailIntent.setData(Uri.parse("mailto:igaskenya@gmail.com"));
+                        try {
+                            startActivity(emailIntent);
+                        } catch (ActivityNotFoundException e) {
+                            //When there is no email app installed
+                            Toast.makeText(HomeActivity.this, "No email app installed! Please install an email app and try again", Toast.LENGTH_SHORT).show();
+                        }
+
+                        break;
+
+                }
+
+                dialog.dismiss();
+            }
+        }).show();
+
+
     }
 }

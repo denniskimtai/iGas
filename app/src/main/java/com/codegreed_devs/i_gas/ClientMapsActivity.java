@@ -39,6 +39,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
@@ -118,13 +119,53 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                     vendorFound = true;
                     vendorFoundId = key;
 
-                    //Save order details under vendorfound id
-//                    DatabaseReference availebleDriverRef = FirebaseDatabase.getInstance().getReference().child("Available vendors").child(vendorFoundId);
-//                    HashMap map = new HashMap();
-//                    map.put();
+                    //get Strings from orderDetails activity
+                    Intent intentKey = getIntent();
+                    String Unique_Key = intentKey.getExtras().getString("Unique_Key");
+
+                    Intent gasSizeInt = getIntent();
+                    String gasSize = gasSizeInt.getExtras().getString("gasSize");
+
+                    Intent gasTypeInt = getIntent();
+                    String gasType = gasTypeInt.getExtras().getString("gasType");
+
+                    Intent numberOfCylindersInt = getIntent();
+                    String numberOfCylinders = numberOfCylindersInt.getExtras().getString("numberOfCylinders");
+
+                    Intent GasBrandInt = getIntent();
+                    String GasBrand = GasBrandInt.getExtras().getString("GasBrand");
+
+                    //save vendorFoundId under order details of client
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    final DatabaseReference orderDetailsRef = FirebaseDatabase.getInstance().getReference("Order Details").child(userId).child(Unique_Key);
+
+
+                    final Map<String, String> keyMap = new HashMap<String, String>();
+                    keyMap.put("Order Id", Unique_Key);
+                    keyMap.put("Client Id", userId);
+                    keyMap.put("Gas Size", gasSize);
+                    keyMap.put("Gas Type", gasType);
+                    keyMap.put("Number Of Cylinders", numberOfCylinders);
+                    keyMap.put("Gas Brand", GasBrand);
+                    keyMap.put("Vendor Id", vendorFoundId);
+
+
+                    orderDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            orderDetailsRef.setValue(keyMap);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
 
                     String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    FirebaseDatabase.getInstance().getReference("Order Details").child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    DatabaseReference getChangeInDbRef = FirebaseDatabase.getInstance().getReference("Order Details");
+                    String uniqueKey = getChangeInDbRef.push().getKey();
+                    getChangeInDbRef.child(clientId).child(uniqueKey).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 

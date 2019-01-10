@@ -68,7 +68,6 @@ public class RegistrationActivity extends AppCompatActivity {
                     signupButton.setBackgroundColor(Color.parseColor("#689F38"));
                     signupButton.setText("Sign Up");
                     signupButton.setTextSize(17);
-//
                 } else {
                     signupButton.setEnabled(false);
                     signupButton.setBackgroundColor(Color.GRAY);

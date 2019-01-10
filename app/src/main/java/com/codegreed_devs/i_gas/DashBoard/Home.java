@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import com.codegreed_devs.i_gas.ClientMapsActivity;
+import com.codegreed_devs.i_gas.OrderConfirmationActivity;
 import com.codegreed_devs.i_gas.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -121,7 +123,11 @@ public class Home extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                                 DatabaseReference gasEquipmentRef = FirebaseDatabase.getInstance().getReference("Order Details");
-                                gasEquipmentRef.child(clientId).setValue(gasEquipments);
+                                String key = gasEquipmentRef.push().getKey();
+                                gasEquipmentRef.child(clientId).child(key).setValue(gasEquipments);
+
+                                Intent intent = new Intent(getActivity(), OrderConfirmationActivity.class);
+                                startActivity(intent);
 
 
 

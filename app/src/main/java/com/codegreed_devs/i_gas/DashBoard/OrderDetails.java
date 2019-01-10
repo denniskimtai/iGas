@@ -45,6 +45,8 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
         mnumberOfCylinders = findViewById(R.id.numberOfCylinders);
         mGasBrand = findViewById(R.id.gasBrand);
 
+        final String key = FirebaseDatabase.getInstance().getReference("Order Details").push().getKey();
+
         orderNow = findViewById(R.id.orderNow);
         orderNow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,11 +55,17 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
 
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 DatabaseReference orderDetailsRef = FirebaseDatabase.getInstance().getReference("Order Details");
-                OrderDetailsClass orderDetails = new OrderDetailsClass(gasSize, gasType, numberOfCylinders, GasBrand);
-                orderDetailsRef.child(userId).setValue(orderDetails);
+                OrderDetailsClass orderDetails = new OrderDetailsClass(gasSize, gasType, numberOfCylinders, GasBrand, userId, key);
+                orderDetailsRef.child(userId).child(key).setValue(orderDetails);
 
                 //go to clientsMapsActivity
                 Intent intent = new Intent(OrderDetails.this, ClientMapsActivity.class);
+                intent.putExtra("Unique_Key", key);
+                intent.putExtra("gasSize", gasSize);
+                intent.putExtra("gasType", gasType);
+                intent.putExtra("numberOfCylinders", numberOfCylinders);
+                intent.putExtra("GasBrand", GasBrand);
+
                 startActivity(intent);
                 finish();
 
