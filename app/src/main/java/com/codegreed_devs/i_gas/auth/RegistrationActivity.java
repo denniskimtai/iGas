@@ -1,13 +1,16 @@
 package com.codegreed_devs.i_gas.auth;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -16,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codegreed_devs.i_gas.BuildConfig;
 import com.codegreed_devs.i_gas.DashBoard.Home;
 import com.codegreed_devs.i_gas.DashBoard.HomeActivity;
 import com.codegreed_devs.i_gas.R;
@@ -25,8 +29,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class RegistrationActivity extends AppCompatActivity {
+    private static final String TAG = "FCMToken";
+    private DatabaseReference mDatabaseRef;
+    private SharedPreferences sharedPref;
     private Button signupButton;
     private CheckBox checkBoxTerms;
     private EditText regPassword, confirm_password, regEmail, regFullName, regPhoneNumber, regLocation;
@@ -40,6 +49,9 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        sharedPref = getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID + "SHARED_PREF", Context.MODE_PRIVATE);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
         //Initialize objects
         regPassword = findViewById(R.id.reg_password);
@@ -142,11 +154,6 @@ public class RegistrationActivity extends AppCompatActivity {
                             RegistrationActivityClass registrationActivity = new RegistrationActivityClass(mFullName,mEmail,mPhoneNumber,mLocation);
                             regActivityRef.child(clientId).setValue(registrationActivity);
 
-                            Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
-                            startActivity(intent);
-
-
-
                         } else {
                             progressDialog.dismiss();
                             Toast.makeText(RegistrationActivity.this, "Registration failed! Please check your internet connection or password and try again", Toast.LENGTH_SHORT).show();
@@ -174,4 +181,23 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
+    private void sendFCMTokenToDatabase(final String clientId) {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (!task.isSuccessful()) {
+                    Log.e(TAG, "Couldn't get the FCM token");
+                }
+
+                String token = task.getResult().getToken();
+                mDatabaseRef.child("clients").child(clientId).child("fcm_token").setValue(token).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        progressDialog.dismiss();
+                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    }
+                });
+            }
+        });
+    }
 }

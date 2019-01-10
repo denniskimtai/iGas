@@ -52,6 +52,11 @@
             android:label="@string/title_activity_client_maps" />
         <activity android:name=".DashBoard.OrderDetails" />
         <activity android:name=".OrderConfirmationActivity" />
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
