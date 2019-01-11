@@ -75,27 +75,36 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
         orderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Change text on button
-                orderButton.setText("Finding a vendor...");
-                //get client id
-                String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                switch (orderButton.getText().toString().trim())
+                {
+                    case "Order now":
+                        //Change text on button
+                        orderButton.setText("Finding a vendor...");
+                        //get client id
+                        String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                //Create database reference for request
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference ref = database.getReference("clientRequest");
+                        //Create database reference for request
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference ref = database.getReference("clientRequest");
 
-                //Location for client
-                GeoFire geoFire = new GeoFire(ref);
-                geoFire.setLocation(clientId, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
-                    @Override
-                    public void onComplete(String key, DatabaseError error) {
+                        //Location for client
+                        GeoFire geoFire = new GeoFire(ref);
+                        geoFire.setLocation(clientId, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
+                            @Override
+                            public void onComplete(String key, DatabaseError error) {
 
-                    }
-                });
-                    //Send client location to vendor
-                deliveryLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                            }
+                        });
+                        //Send client location to vendor
+                        deliveryLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-                getClosestvendor();
+                        getClosestvendor();
+                        break;
+                    case "Done!":
+                        startActivity(new Intent(getApplicationContext(), OrderConfirmationActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        finish();
+                        break;
+                }
 
             }
         });
@@ -126,6 +135,12 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                 if (!vendorFound) {
                     vendorFound = true;
                     vendorFoundId = key;
+
+                    //Add new marker to new updated position
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(location.latitude, location.longitude))
+                            .title("Vendor location"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.latitude, location.longitude), 11));
 
                     //get Strings from orderDetails activity
                     Intent intentKey = getIntent();
@@ -178,9 +193,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful())
                             {
-                                //Go to orderdetails activity to receive order details
-                                Intent intent = new Intent(ClientMapsActivity.this, OrderConfirmationActivity.class);
-                                startActivity(intent);
+                                orderButton.setText("Done!");
                             }
                             else if (task.getException() != null)
                             {
@@ -230,7 +243,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-
+                Log.e("GEOQUERY ERROR", error.getMessage());
             }
         });
 
@@ -288,7 +301,8 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
         geoFire.setLocation(clientId, new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
             @Override
             public void onComplete(String key, DatabaseError error) {
-
+                if (error != null)
+                    Log.e("GEOFIRE ERROR", error.getMessage());
             }
         });
 
@@ -310,6 +324,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                     Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             return;
         }
+
         //Trigger refreshment of location
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
@@ -341,6 +356,9 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
             }
         });
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
         finish();
 

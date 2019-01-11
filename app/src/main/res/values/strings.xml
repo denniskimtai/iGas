@@ -34,5 +34,5 @@
     <string name="title_activity_client_maps">Map</string>
     <string name="spinner_hint">Number of cylinders</string>
     <string name="login">Login</string>
-    <string name="order_now">order now</string>
+    <string name="order_now">Order now</string>
 </resources>

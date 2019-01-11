@@ -19,6 +19,8 @@
         android:layout_gravity="bottom"
         android:background="@color/colorPrimaryDark"
         android:text="@string/order_now"
+        android:textSize="18sp"
+        android:textAllCaps="false"
         android:textColor="@color/white"/>
 
 </FrameLayout>
