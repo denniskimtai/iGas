@@ -84,7 +84,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loginUser();
-
             }
         });
 
@@ -118,13 +117,13 @@ public class LoginActivity extends AppCompatActivity {
 
         //Display progress dialog
         progressDialog.setMessage("Signing in Please wait...");
+        progressDialog.show();
 
         //login user
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressDialog.dismiss();
 
                         //Check if task is successful or not
                         if (task.isSuccessful()){
@@ -133,6 +132,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         else if (task.getException() != null)
                         {
+                            progressDialog.dismiss();
                             Toast.makeText(LoginActivity.this, "Couldn't log in", Toast.LENGTH_SHORT).show();
                             Log.e("AUTH ERROR", task.getException().getMessage());
                         }
@@ -148,22 +148,26 @@ public class LoginActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 editor.putString("ClientId", uid);
-                editor.putString("ClientNames", dataSnapshot.child("clientNames").getValue(String.class));
+                editor.putString("ClientNames", dataSnapshot.child("clientName").getValue(String.class));
                 editor.putString("ClientEmail", dataSnapshot.child("clientEmail").getValue(String.class));
                 editor.putString("ClientPhoneNumber", dataSnapshot.child("regPhoneNumber").getValue(String.class));
                 editor.putString("ClientLocation", dataSnapshot.child("regLocation").getValue(String.class));
 
                 editor.apply();
 
+                progressDialog.dismiss();
+
                 Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(), Home.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                startActivity(new Intent(getApplicationContext(), HomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 finish();
 
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                progressDialog.dismiss();
+                Toast.makeText(LoginActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                Log.e("DATABASE ERROR", databaseError.getMessage());
             }
         });
     }

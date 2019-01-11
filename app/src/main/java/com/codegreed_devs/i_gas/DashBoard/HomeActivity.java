@@ -1,8 +1,10 @@
 package com.codegreed_devs.i_gas.DashBoard;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codegreed_devs.i_gas.BuildConfig;
 import com.codegreed_devs.i_gas.R;
 import com.codegreed_devs.i_gas.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +40,8 @@ public class HomeActivity extends AppCompatActivity
     private ImageView userProfilePhoto;
     private Uri photoUrl;
     FirebaseAuth mAuth;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +52,13 @@ public class HomeActivity extends AppCompatActivity
 
         mAuth = FirebaseAuth.getInstance();
 
-        String mUserName = mAuth.getCurrentUser().getDisplayName();
-        String mUserEmail = mAuth.getCurrentUser().getEmail();
+        //initialize shared preference
+        sharedPreferences = getSharedPreferences(BuildConfig.APPLICATION_ID + "SHARED_PREF", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        String mUserName = sharedPreferences.getString("ClientNames", "");
+        String mUserEmail = sharedPreferences.getString("ClientEmail", "");
         photoUrl = mAuth.getCurrentUser().getPhotoUrl();
-
-
-
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -76,8 +82,7 @@ public class HomeActivity extends AppCompatActivity
         userEmail = navigationView.getHeaderView(0).findViewById(R.id.userEmail);
         userProfilePhoto = navigationView.getHeaderView(0).findViewById(R.id.userProfilePhoto);
 
-
-        userName.setText("Welcome" + mUserName);
+        userName.setText("Welcome " + mUserName);
         userEmail.setText(mUserEmail);
 
         Picasso.get()
@@ -191,6 +196,8 @@ public class HomeActivity extends AppCompatActivity
 
             case R.id.nav_logout:
                 FirebaseAuth.getInstance().signOut();
+                editor.clear();
+                editor.apply();
                 Intent intent  = new Intent(HomeActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();

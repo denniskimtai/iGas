@@ -1,8 +1,11 @@
 package com.codegreed_devs.i_gas.DashBoard;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,10 +14,13 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codegreed_devs.i_gas.ClientMapsActivity;
 import com.codegreed_devs.i_gas.OrderConfirmationActivity;
 import com.codegreed_devs.i_gas.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -23,6 +29,7 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
 
     TextView mnumberOfCylinders, mGasBrand;
     Button orderNow;
+    String gasBrand = "";
     String gasSize = "";
     String gasType = "";
     String numberOfCylinders = "";
@@ -49,25 +56,24 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
         orderNow = findViewById(R.id.orderNow);
         orderNow.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                String GasBrand = mGasBrand.getText().toString().trim();
+            public void onClick(final View v) {
 
-                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                DatabaseReference orderDetailsRef = FirebaseDatabase.getInstance().getReference("Order Details");
-                OrderDetailsClass orderDetails = new OrderDetailsClass(gasSize, gasType, numberOfCylinders, GasBrand, userId, key);
-                orderDetailsRef.child(userId).child(key).setValue(orderDetails);
+                gasBrand = mGasBrand.getText().toString().trim();
 
-                //go to clientsMapsActivity
-                Intent intent = new Intent(OrderDetails.this, ClientMapsActivity.class);
-                intent.putExtra("Unique_Key", key);
-                intent.putExtra("gasSize", gasSize);
-                intent.putExtra("gasType", gasType);
-                intent.putExtra("numberOfCylinders", numberOfCylinders);
-                intent.putExtra("GasBrand", GasBrand);
+                //MOVED CODE TO POST CLIENT ORDER DETAILS TO MAPS ACTIVITY
+                if (validate())
+                {
+                    //go to clientsMapsActivity
+                    Intent intent = new Intent(OrderDetails.this, ClientMapsActivity.class);
+                    intent.putExtra("Unique_Key", key);
+                    intent.putExtra("gasSize", gasSize);
+                    intent.putExtra("gasType", gasType);
+                    intent.putExtra("numberOfCylinders", numberOfCylinders);
+                    intent.putExtra("GasBrand", gasBrand);
 
-                startActivity(intent);
-                finish();
-
+                    startActivity(intent);
+                    finish();
+                }
 
             }
         });
@@ -148,6 +154,33 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
 
         }
 
+    }
+
+    private boolean validate() {
+
+        if (TextUtils.isEmpty(gasSize))
+        {
+            Toast.makeText(this, "Choose gas size", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if (TextUtils.isEmpty(gasType))
+        {
+            Toast.makeText(this, "Choose gas type", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if (TextUtils.isEmpty(numberOfCylinders))
+        {
+            Toast.makeText(this, "Choose number of cylinders", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if (TextUtils.isEmpty(gasBrand))
+        {
+            Toast.makeText(this, "Enter gas brand", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+
+        return true;
     }
 
 }

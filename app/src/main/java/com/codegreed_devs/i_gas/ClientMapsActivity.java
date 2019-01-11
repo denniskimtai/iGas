@@ -1,6 +1,7 @@
 package com.codegreed_devs.i_gas;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,11 +11,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.codegreed_devs.i_gas.DashBoard.OrderDetails;
+import com.codegreed_devs.i_gas.DashBoard.OrderDetailsClass;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -31,6 +34,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -54,10 +59,16 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null)
+        {
+            mapFragment.onCreate(null);
+            mapFragment.onResume();
+            mapFragment.getMapAsync(this);
+        }
 
         orderButton = findViewById(R.id.order_button);
 
@@ -97,7 +108,6 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
     private boolean vendorFound = false;
     private String vendorFoundId;
 
-
     private void getClosestvendor() {
         //Add vendors location as child of vendors available
         DatabaseReference vendorLocation = FirebaseDatabase.getInstance().getReference().child("Available Vendors");
@@ -119,6 +129,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
                     //get Strings from orderDetails activity
                     Intent intentKey = getIntent();
+
                     String Unique_Key = intentKey.getExtras().getString("Unique_Key");
 
                     Intent gasSizeInt = getIntent();
@@ -135,50 +146,66 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
                     //save vendorFoundId under order details of client
                     String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    final DatabaseReference orderDetailsRef = FirebaseDatabase.getInstance().getReference("Order Details").child(userId).child(Unique_Key);
-
+                    final DatabaseReference orderDetailsRef = FirebaseDatabase
+                            .getInstance().getReference("Order Details").child(vendorFoundId).child(Unique_Key);
 
                     final Map<String, String> keyMap = new HashMap<String, String>();
-                    keyMap.put("Order Id", Unique_Key);
-                    keyMap.put("Client Id", userId);
-                    keyMap.put("Gas Size", gasSize);
-                    keyMap.put("Gas Type", gasType);
-                    keyMap.put("Number Of Cylinders", numberOfCylinders);
-                    keyMap.put("Gas Brand", GasBrand);
-                    keyMap.put("Vendor Id", vendorFoundId);
+                    keyMap.put("orderId", Unique_Key);
+                    keyMap.put("clientId", userId);
+                    keyMap.put("gasSize", gasSize);
+                    keyMap.put("gasType", gasType);
+                    keyMap.put("mnumberOfCylinders", numberOfCylinders);
+                    keyMap.put("gasBrand", GasBrand);
+                    keyMap.put("vendorId", vendorFoundId);
+                    keyMap.put("orderStatus", "waiting");
 
-
-                    orderDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    //MOVED THIS FROM PREVIOUS ACTIVITY
+                    FirebaseDatabase
+                            .getInstance()
+                            .getReference("Order Details")
+                            .child(userId).child(Unique_Key).setValue(keyMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            orderDetailsRef.setValue(keyMap);
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (!task.isSuccessful() && task.getException() != null)
+                            {
+                                Log.e("DATATBASE ERROR", task.getException().getMessage());
+                            }
                         }
+                    });
 
+                    orderDetailsRef.setValue(keyMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful())
+                            {
+                                //Go to orderdetails activity to receive order details
+                                Intent intent = new Intent(ClientMapsActivity.this, OrderConfirmationActivity.class);
+                                startActivity(intent);
+                            }
+                            else if (task.getException() != null)
+                            {
+                                Log.e("DATABASE ERROR", task.getException().getMessage());
+                            }
                         }
                     });
 
-                    String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    DatabaseReference getChangeInDbRef = FirebaseDatabase.getInstance().getReference("Order Details");
-                    String uniqueKey = getChangeInDbRef.push().getKey();
-                    getChangeInDbRef.child(clientId).child(uniqueKey).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    THIS MIGHT INTERFERE WITH GEOLOCATION SEARCH
 
-                            FirebaseDatabase.getInstance().getReference("Available Vendors").child(vendorFoundId).child("Client Order Details").setValue(dataSnapshot.getValue());
+//                    DatabaseReference getChangeInDbRef = FirebaseDatabase.getInstance().getReference("Order Details");
+//                    getChangeInDbRef.child(vendorFoundId).child(Unique_Key).addListenerForSingleValueEvent(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                            FirebaseDatabase.getInstance().getReference("Available Vendors").child(vendorFoundId).child("Client Order Details").setValue(dataSnapshot.getValue());
+//
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                        }
+//                    });
 
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                    //Go to orderdetails activity to receive order details
-                    Intent intent = new Intent(ClientMapsActivity.this, OrderConfirmationActivity.class);
-                    startActivity(intent);
                 }
             }
 
@@ -206,18 +233,23 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
             }
         });
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             return;
         }
 
         buildApiClient();
         mMap.setMyLocationEnabled(true);
+
     }
 
     protected synchronized void buildApiClient(){
@@ -231,7 +263,6 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
         mGoogleApiClient.connect();
 
     }
-
 
     //Get changed location
     @Override
@@ -264,8 +295,6 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
     }
 
-
-
     //When map is connected to specified location
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -277,7 +306,8 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             return;
         }
         //Trigger refreshment of location
@@ -314,5 +344,17 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
         finish();
 
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        {
+            buildApiClient();
+            if (mMap != null)
+                mMap.setMyLocationEnabled(true);
+        }
     }
 }
