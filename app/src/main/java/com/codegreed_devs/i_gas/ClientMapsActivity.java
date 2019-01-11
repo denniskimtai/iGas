@@ -2,6 +2,8 @@ package com.codegreed_devs.i_gas;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -183,7 +185,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                         public void onComplete(@NonNull Task<Void> task) {
                             if (!task.isSuccessful() && task.getException() != null)
                             {
-                                Log.e("DATATBASE ERROR", task.getException().getMessage());
+                                Log.e("DATABASE ERROR", task.getException().getMessage());
                             }
                         }
                     });
@@ -193,6 +195,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful())
                             {
+                                alertVendorFound(vendorFoundId);
                                 orderButton.setText("Done!");
                             }
                             else if (task.getException() != null)
@@ -247,6 +250,43 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
             }
         });
 
+    }
+
+    private void alertVendorFound(String vendorFoundId) {
+
+        FirebaseDatabase.getInstance().getReference("vendors").child(vendorFoundId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                String vendorName = dataSnapshot.child("business_name").getValue(String.class);
+                String vendorEmail = dataSnapshot.child("business_email").getValue(String.class);
+                String vendorAddress = dataSnapshot.child("business_address").getValue(String.class);
+
+                String message = "Vendor Name : " + vendorName + "\n";
+                message += "Vendor Email : " + vendorEmail + "\n";
+                message += "Vendor Address : " + vendorAddress;
+
+                if (vendorAddress != null)
+                {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(ClientMapsActivity.this);
+                    alert.setTitle("Vendor Found");
+                    alert.setMessage(message);
+                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            //ignore and close dialog
+                        }
+                    });
+                    alert.show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
