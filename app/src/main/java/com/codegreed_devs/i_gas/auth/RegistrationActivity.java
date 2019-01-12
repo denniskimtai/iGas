@@ -139,6 +139,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                         Toast.makeText(RegistrationActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
                                         startActivity(intent);
+                                        finish();
                                     }
                                     else if (task.getException() != null)
                                     {
@@ -212,18 +213,19 @@ public class RegistrationActivity extends AppCompatActivity {
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if (!task.isSuccessful()) {
-                    Log.e(TAG, "Couldn't get the FCM token");
+                if (task.isSuccessful()) {
+                    mDatabaseRef.child("clients").child(clientId).child("fcm_token")
+                            .setValue(task.getResult().getToken())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (!task.isSuccessful() && task.getException() != null)
+                                        Log.e(TAG, task.getException().getMessage());
+                                }
+                            });
+                } else if (task.getException() != null) {
+                    Log.e(TAG, task.getException().getMessage());
                 }
-
-                String token = task.getResult().getToken();
-                mDatabaseRef.child("clients").child(clientId).child("fcm_token").setValue(token).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        progressDialog.dismiss();
-                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                    }
-                });
             }
         });
     }

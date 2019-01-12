@@ -33,6 +33,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -141,11 +143,14 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    //get user details from database and save to shared preference
     private void saveUserDetails(final String uid) {
 
         rootRef.child("clients").child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                sendFCMTokenToDatabase(uid);
 
                 editor.putString("ClientId", uid);
                 editor.putString("ClientNames", dataSnapshot.child("clientName").getValue(String.class));
@@ -172,6 +177,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    //toggle password visibility
     private void showPassword(){
 
         checkBoxShowPassword.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -185,6 +191,28 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    //get current fcm token and send to database
+    private void sendFCMTokenToDatabase(final String clientId) {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (task.isSuccessful()) {
+                    rootRef.child("clients").child(clientId).child("fcm_token")
+                            .setValue(task.getResult().getToken())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (!task.isSuccessful() && task.getException() != null)
+                                        Log.e("FCM ERROR", task.getException().getMessage());
+                                }
+                            });
+                } else if (task.getException() != null) {
+                    Log.e("FCM ERROR", task.getException().getMessage());
+                }
+            }
+        });
     }
 
 

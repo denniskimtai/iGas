@@ -44,12 +44,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
+    public static final String FCM_LEGACY_API_TOKEN = "AIzaSyAaslzBTkkRgiPqNIriqewsvZhqZ64lL2Q";
+    public static final String FCM_LEGACY_URL = "https://fcm.googleapis.com/fcm/send";
+    public static final int HTTP_RESPONSE_OK = 200;
     private GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
@@ -82,6 +95,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                     case "Order now":
                         //Change text on button
                         orderButton.setText("Finding a vendor...");
+                        orderButton.setEnabled(false);
                         //get client id
                         String clientId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -144,95 +158,20 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                             .title("Vendor location"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.latitude, location.longitude), 11));
 
-                    //get Strings from orderDetails activity
-                    Intent intentKey = getIntent();
-
-                    String Unique_Key = intentKey.getExtras().getString("Unique_Key");
-
-                    Intent gasSizeInt = getIntent();
-                    String gasSize = gasSizeInt.getExtras().getString("gasSize");
-
-                    Intent gasTypeInt = getIntent();
-                    String gasType = gasTypeInt.getExtras().getString("gasType");
-
-                    Intent numberOfCylindersInt = getIntent();
-                    String numberOfCylinders = numberOfCylindersInt.getExtras().getString("numberOfCylinders");
-
-                    Intent GasBrandInt = getIntent();
-                    String GasBrand = GasBrandInt.getExtras().getString("GasBrand");
-
-                    //save vendorFoundId under order details of client
-                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    final DatabaseReference orderDetailsRef = FirebaseDatabase
-                            .getInstance().getReference("Order Details").child(vendorFoundId).child(Unique_Key);
-
-                    final Map<String, String> keyMap = new HashMap<String, String>();
-                    keyMap.put("orderId", Unique_Key);
-                    keyMap.put("clientId", userId);
-                    keyMap.put("gasSize", gasSize);
-                    keyMap.put("gasType", gasType);
-                    keyMap.put("mnumberOfCylinders", numberOfCylinders);
-                    keyMap.put("gasBrand", GasBrand);
-                    keyMap.put("vendorId", vendorFoundId);
-                    keyMap.put("orderStatus", "waiting");
-
-                    //MOVED THIS FROM PREVIOUS ACTIVITY
-                    FirebaseDatabase
-                            .getInstance()
-                            .getReference("Order Details")
-                            .child(userId).child(Unique_Key).setValue(keyMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (!task.isSuccessful() && task.getException() != null)
-                            {
-                                Log.e("DATABASE ERROR", task.getException().getMessage());
-                            }
-                        }
-                    });
-
-                    orderDetailsRef.setValue(keyMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful())
-                            {
-                                alertVendorFound(vendorFoundId);
-                                orderButton.setText("Done!");
-                            }
-                            else if (task.getException() != null)
-                            {
-                                Log.e("DATABASE ERROR", task.getException().getMessage());
-                            }
-                        }
-                    });
-
-//                    THIS MIGHT INTERFERE WITH GEOLOCATION SEARCH
-
-//                    DatabaseReference getChangeInDbRef = FirebaseDatabase.getInstance().getReference("Order Details");
-//                    getChangeInDbRef.child(vendorFoundId).child(Unique_Key).addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//                            FirebaseDatabase.getInstance().getReference("Available Vendors").child(vendorFoundId).child("Client Order Details").setValue(dataSnapshot.getValue());
-//
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                        }
-//                    });
-
+                    alertVendorFound(vendorFoundId);
                 }
             }
 
             @Override
             public void onKeyExited(String key) {
-
+                orderButton.setEnabled(true);
+                orderButton.setText(getResources().getString(R.string.order_now));
             }
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-
+                orderButton.setEnabled(true);
+                orderButton.setText(getResources().getString(R.string.order_now));
             }
 
             @Override
@@ -247,12 +186,14 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
             @Override
             public void onGeoQueryError(DatabaseError error) {
                 Log.e("GEOQUERY ERROR", error.getMessage());
+                orderButton.setEnabled(true);
+                orderButton.setText(getResources().getString(R.string.order_now));
             }
         });
 
     }
 
-    private void alertVendorFound(String vendorFoundId) {
+    private void alertVendorFound(final String vendorFoundId) {
 
         FirebaseDatabase.getInstance().getReference("vendors").child(vendorFoundId).addValueEventListener(new ValueEventListener() {
             @Override
@@ -261,6 +202,7 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                 String vendorName = dataSnapshot.child("business_name").getValue(String.class);
                 String vendorEmail = dataSnapshot.child("business_email").getValue(String.class);
                 String vendorAddress = dataSnapshot.child("business_address").getValue(String.class);
+                final String vendorFCMToken = dataSnapshot.child("fcm_token").getValue(String.class);
 
                 String message = "Vendor Name : " + vendorName + "\n";
                 message += "Vendor Email : " + vendorEmail + "\n";
@@ -271,10 +213,11 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
                     AlertDialog.Builder alert = new AlertDialog.Builder(ClientMapsActivity.this);
                     alert.setTitle("Vendor Found");
                     alert.setMessage(message);
+                    alert.setCancelable(false);
                     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            //ignore and close dialog
+                            saveOrderDetails(vendorFoundId, vendorFCMToken);
                         }
                     });
                     alert.show();
@@ -287,6 +230,175 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
             }
         });
+    }
+
+    private void saveOrderDetails(final String vendorFoundId, final String vendorFCMToken){
+
+        //get Strings from orderDetails activity
+        Intent intentKey = getIntent();
+
+        final String Unique_Key = intentKey.getExtras().getString("Unique_Key");
+
+        Intent gasSizeInt = getIntent();
+        String gasSize = gasSizeInt.getExtras().getString("gasSize");
+
+        Intent gasTypeInt = getIntent();
+        String gasType = gasTypeInt.getExtras().getString("gasType");
+
+        Intent numberOfCylindersInt = getIntent();
+        String numberOfCylinders = numberOfCylindersInt.getExtras().getString("numberOfCylinders");
+
+        Intent GasBrandInt = getIntent();
+        String GasBrand = GasBrandInt.getExtras().getString("GasBrand");
+
+        //save vendorFoundId under order details of client
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final DatabaseReference orderDetailsRef = FirebaseDatabase
+                .getInstance().getReference("Order Details").child(vendorFoundId).child(Unique_Key);
+
+        final Map<String, String> keyMap = new HashMap<String, String>();
+        keyMap.put("orderId", Unique_Key);
+        keyMap.put("clientId", userId);
+        keyMap.put("gasSize", gasSize);
+        keyMap.put("gasType", gasType);
+        keyMap.put("mnumberOfCylinders", numberOfCylinders);
+        keyMap.put("gasBrand", GasBrand);
+        keyMap.put("vendorId", vendorFoundId);
+        keyMap.put("orderStatus", "waiting");
+
+        //MOVED THIS FROM PREVIOUS ACTIVITY
+        FirebaseDatabase
+                .getInstance()
+                .getReference("Order Details")
+                .child(userId).child(Unique_Key).setValue(keyMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (!task.isSuccessful() && task.getException() != null)
+                {
+                    Log.e("DATABASE ERROR", task.getException().getMessage());
+                }
+            }
+        });
+
+        orderDetailsRef.setValue(keyMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful())
+                {
+                    orderButton.setText("Done!");
+                    sendFCMNotification(vendorFCMToken, Unique_Key, vendorFoundId);
+                }
+                else if (task.getException() != null)
+                {
+                    orderButton.setEnabled(true);
+                    Log.e("DATABASE ERROR", task.getException().getMessage());
+                }
+            }
+        });
+    }
+
+    private void sendFCMNotification(String vendorFCMToken, String orderId, String vendorId){
+        if (vendorFCMToken != null)
+        {
+            String jsonData = "{";
+            jsonData += "\"to\":";
+            jsonData += "\"" + vendorFCMToken + "\",";
+            jsonData += "\"notification\":";
+            jsonData += "{";
+            jsonData += "\"title\":";
+            jsonData += "\"New Order\",";
+            jsonData += "\"body\":";
+            jsonData += "\"You have a new order\"";
+            jsonData += "},";
+            jsonData += "\"restricted_package_name\":";
+            jsonData += "\"codegreed_devs.com.igasvendor\",";
+            jsonData += "\"data\":{";
+            jsonData += "\"order_id\":";
+            jsonData += "\"" + orderId + "\",";
+            jsonData += "\"vendor_id\":";
+            jsonData += "\"" + vendorId + "\"";
+            jsonData += "}";
+            jsonData += "}";
+
+            try {
+
+                JSONObject jsonObject = new JSONObject(jsonData);
+
+                Log.e("FCM JSON", jsonObject.toString());
+
+                post(jsonObject.toString(), new Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        Log.e("OKHTTP ERROR", e.getMessage());
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+
+                        int response_code = response.code();
+
+                        Log.e("HTTP RESPONSE CODE", String.valueOf(response_code));
+
+                        if (response_code == HTTP_RESPONSE_OK)
+                        {
+
+                            final String responseMessage = response.body().string();
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    Log.e("FCM RESPONSE", responseMessage);
+
+                                    try {
+
+                                        JSONObject jsonObject = new JSONObject(responseMessage);
+
+                                        int success = jsonObject.getInt("success");
+
+                                        if (success != 0)
+                                        {
+                                            Toast.makeText(ClientMapsActivity.this, "Vendor notified!", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+                            });
+                        }
+
+                    }
+                });
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            Log.e("NOTIFICATION STATUS", "VENDOR FCM TOKEN ABSENT");
+        }
+    }
+
+    private void post(String jsonPayload, Callback callback){
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        RequestBody requestBody = RequestBody.create(JSON, jsonPayload);
+
+        Request request = new Request.Builder()
+                .url(FCM_LEGACY_URL)
+                .addHeader("Content-Type","application/json")
+                .addHeader("Accept", "application/json")
+                .addHeader("Authorization", "key=" + FCM_LEGACY_API_TOKEN)
+                .post(requestBody)
+                .build();
+
+        okHttpClient.newCall(request).enqueue(callback);
     }
 
     @Override
