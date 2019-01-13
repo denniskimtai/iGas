@@ -64,13 +64,12 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
                 if (validate())
                 {
                     //go to clientsMapsActivity
-                    Intent intent = new Intent(OrderDetails.this, ClientMapsActivity.class);
+                    Intent intent = new Intent(OrderDetails.this, OrderPreviewActivity.class);
                     intent.putExtra("Unique_Key", key);
                     intent.putExtra("gasSize", gasSize);
                     intent.putExtra("gasType", gasType);
                     intent.putExtra("numberOfCylinders", numberOfCylinders);
                     intent.putExtra("GasBrand", gasBrand);
-
                     startActivity(intent);
                     finish();
                 }

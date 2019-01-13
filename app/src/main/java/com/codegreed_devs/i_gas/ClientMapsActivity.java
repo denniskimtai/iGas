@@ -3,11 +3,13 @@ package com.codegreed_devs.i_gas;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.codegreed_devs.i_gas.DashBoard.HomeActivity;
 import com.codegreed_devs.i_gas.DashBoard.OrderDetails;
 import com.codegreed_devs.i_gas.DashBoard.OrderDetailsClass;
 import com.firebase.geofire.GeoFire;
@@ -111,13 +114,15 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
 
                             }
                         });
+                        getClosestvendor();
                         //Send client location to vendor
                         deliveryLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
                         getClosestvendor();
                         break;
                     case "Done!":
-                        startActivity(new Intent(getApplicationContext(), OrderConfirmationActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        Intent intent = new Intent(ClientMapsActivity.this, HomeActivity.class);
+                        startActivity(intent);
                         finish();
                         break;
                 }
@@ -134,13 +139,20 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
     private String vendorFoundId;
 
     private void getClosestvendor() {
+
+        //Get current location of client
+        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+
         //Add vendors location as child of vendors available
         DatabaseReference vendorLocation = FirebaseDatabase.getInstance().getReference().child("Available Vendors");
 
         GeoFire geoFire = new GeoFire(vendorLocation);
 
         //Query geofire for closest vendor around the clients location
-        GeoQuery geoQuery  = geoFire.queryAtLocation(new GeoLocation(deliveryLocation.latitude, deliveryLocation.longitude), radius);
+        GeoQuery geoQuery  = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), radius);
         geoQuery.removeAllListeners();
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
