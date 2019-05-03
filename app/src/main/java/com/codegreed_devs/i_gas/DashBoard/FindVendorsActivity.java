@@ -134,7 +134,7 @@ public class FindVendorsActivity extends FragmentActivity{
                                                         Location vendorLocation = new Location(vendor_id);
                                                         vendorLocation.setLatitude(location.latitude);
                                                         vendorLocation.setLongitude(location.longitude);
-                                                        if (deliveryLocation.distanceTo(vendorLocation) < 20000.000)
+                                                        if (deliveryLocation.distanceTo(vendorLocation) < 1500.000)
                                                         {
                                                             VendorModel vendor = new VendorModel(vendor_id,
                                                                     ds.child("business_name").getValue(String.class),
