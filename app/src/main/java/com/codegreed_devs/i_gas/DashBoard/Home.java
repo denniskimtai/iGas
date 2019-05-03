@@ -15,8 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-
-import com.codegreed_devs.i_gas.ClientMapsActivity;
 import com.codegreed_devs.i_gas.OrderConfirmationActivity;
 import com.codegreed_devs.i_gas.R;
 import com.google.firebase.auth.FirebaseAuth;

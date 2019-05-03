@@ -1,28 +1,19 @@
 package com.codegreed_devs.i_gas.DashBoard;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codegreed_devs.i_gas.ClientMapsActivity;
-import com.codegreed_devs.i_gas.OrderConfirmationActivity;
 import com.codegreed_devs.i_gas.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class OrderDetails extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -63,7 +54,7 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
                 //MOVED CODE TO POST CLIENT ORDER DETAILS TO MAPS ACTIVITY
                 if (validate())
                 {
-                    //go to clientsMapsActivity
+                    //go to order confirmation activity
                     Intent intent = new Intent(OrderDetails.this, OrderPreviewActivity.class);
                     intent.putExtra("Unique_Key", key);
                     intent.putExtra("gasSize", gasSize);

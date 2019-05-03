@@ -35,4 +35,8 @@
     <string name="spinner_hint">Number of cylinders</string>
     <string name="login">Login</string>
     <string name="order_now">Order now</string>
+    <string name="vendor_name">Vendor Name</string>
+    <string name="vendor_address">Vendor Adrress</string>
+    <string name="find_vendor">Find Vendor</string>
+    <string name="no_nearby_vendors">No nearby vendors</string>
 </resources>

@@ -11,15 +11,10 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.codegreed_devs.i_gas.ClientMapsActivity;
 import com.codegreed_devs.i_gas.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class OrderPreviewActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -55,35 +50,19 @@ public class OrderPreviewActivity extends AppCompatActivity implements AdapterVi
         cylinderOnly = findViewById(R.id.cylinderOnly);
 
         gasBrandText = findViewById(R.id.gasBrand);
-         spinner = findViewById(R.id.spinner);
+        spinner = findViewById(R.id.spinner);
 
-         confirmOrderButton = findViewById(R.id.confirmOrder);
-
-
-        //get unique key of order
-        Intent uniqueKeyIntent = getIntent();
-        final String unique_key = uniqueKeyIntent.getExtras().getString("Unique_Key");
+        confirmOrderButton = findViewById(R.id.confirmOrder);
 
         //get current user id
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        final DatabaseReference orderPreviewRef = FirebaseDatabase.getInstance().getReference("Order Details").child(userId).child(unique_key);
-
         //get child values
-
-        Intent GasBrandIntent = getIntent();
-        String GasBrand = GasBrandIntent.getExtras().getString("GasBrand");
-
-        Intent GasTypeIntent = getIntent();
-        String GasType = GasTypeIntent.getExtras().getString("gasType");
-
-        Intent NumberOfCylindersIntent = getIntent();
-        String NumberOfCylinders = NumberOfCylindersIntent.getExtras().getString("numberOfCylinders");
-
-        Intent GasSizeIntent = getIntent();
-        String GasSize = GasSizeIntent.getExtras().getString("gasSize");
-
-
+        final String unique_key = getIntent().getExtras().getString("Unique_Key");
+        String GasBrand = getIntent().getExtras().getString("GasBrand");
+        String GasType = getIntent().getExtras().getString("gasType");
+        String NumberOfCylinders = getIntent().getExtras().getString("numberOfCylinders");
+        String GasSize = getIntent().getExtras().getString("gasSize");
 
                     //set text of gas brand
                     gasBrandText.setText(GasBrand);
@@ -94,7 +73,6 @@ public class OrderPreviewActivity extends AppCompatActivity implements AdapterVi
                             cylinderOnly.setChecked(true);
                             gasTypeString = "Cylinder Only";
                             break;
-
                         case "Complete Gas":
                             completeGas.setChecked(true);
                             gasTypeString = "Complete Gas";
@@ -106,11 +84,9 @@ public class OrderPreviewActivity extends AppCompatActivity implements AdapterVi
                         case "1 Cylinder":
                             spinner.setSelection(0);
                             break;
-
                         case "2 Cylinders":
                             spinner.setSelection(1);
                             break;
-
                         case "3 Cylinders":
                             spinner.setSelection(2);
                             break;
@@ -118,7 +94,6 @@ public class OrderPreviewActivity extends AppCompatActivity implements AdapterVi
                         case "4 Cylinders":
                             spinner.setSelection(3);
                             break;
-
                         case "5 or more Cylinders":
                             spinner.setSelection(4);
                             break;
@@ -151,13 +126,14 @@ public class OrderPreviewActivity extends AppCompatActivity implements AdapterVi
                 //get text of gasBrand
                 String updateGasBrand = gasBrandText.getText().toString();
 
-                Intent intent = new Intent(OrderPreviewActivity.this, ClientMapsActivity.class);
+                Intent intent = new Intent(OrderPreviewActivity.this, FindVendorsActivity.class);
                 intent.putExtra("Unique_Key", unique_key);
                 intent.putExtra("gasSize", gasSize);
                 intent.putExtra("gasType", gasTypeString);
                 intent.putExtra("numberOfCylinders", numberOfCylinders);
                 intent.putExtra("GasBrand", updateGasBrand);
                 startActivity(intent);
+                finish();
 
             }
         });
