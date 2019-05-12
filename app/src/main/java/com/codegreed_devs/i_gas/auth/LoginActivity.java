@@ -23,6 +23,7 @@ import com.codegreed_devs.i_gas.BuildConfig;
 import com.codegreed_devs.i_gas.DashBoard.Home;
 import com.codegreed_devs.i_gas.DashBoard.HomeActivity;
 import com.codegreed_devs.i_gas.R;
+import com.codegreed_devs.i_gas.ResetPasswordActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -38,7 +39,7 @@ import com.google.firebase.iid.InstanceIdResult;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextView noAccount;
+    private TextView noAccount, forgotPassword;
     private EditText loginEmail, loginPassword;
     private Button sign_in_btn;
     private CheckBox checkBoxShowPassword;
@@ -61,6 +62,15 @@ public class LoginActivity extends AppCompatActivity {
         checkBoxShowPassword = findViewById(R.id.checkboxShowPassword);
         progressDialog = new ProgressDialog(this);
         noAccount = findViewById(R.id.noAccount);
+        forgotPassword = findViewById(R.id.forgot_password);
+
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, ResetPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
 
         //Show password if user chooses
         showPassword();
@@ -96,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
 
     }
 

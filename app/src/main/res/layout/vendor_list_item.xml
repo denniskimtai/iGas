@@ -8,7 +8,7 @@
     <ImageView
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:src="@drawable/gas"
+        android:src="@drawable/igaslogo"
         android:layout_margin="10dp"/>
 
     <LinearLayout
@@ -16,21 +16,35 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="10dp"
-        android:gravity="center|start">
+        android:gravity="center|start"
+        android:weightSum="3" >
 
         <TextView
+            android:layout_weight="1"
             android:id="@+id/vendor_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/vendor_name"
-            android:textSize="18sp"/>
+            android:textSize="22sp"
+            android:textColor="@color/black"/>
 
         <TextView
+            android:layout_weight="1"
             android:id="@+id/vendor_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/vendor_address"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:textColor="@color/light_gray"/>
+
+        <TextView
+            android:layout_weight="1"
+            android:id="@+id/vendor_distance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Vendor_Distance"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent"/>
 
     </LinearLayout>
 

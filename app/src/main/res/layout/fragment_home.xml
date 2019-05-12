@@ -121,7 +121,7 @@
                     android:layout_height="wrap_content" />
 
                 <ImageView
-                    android:src="@drawable/gas"
+                    android:src="@drawable/refill"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"/>
@@ -164,7 +164,7 @@
 
 
                 <ImageView
-                    android:src="@drawable/gas"
+                    android:src="@drawable/equipments"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"/>
@@ -205,7 +205,7 @@
                     android:layout_height="wrap_content" />
 
                 <ImageView
-                    android:src="@drawable/gas"
+                    android:src="@drawable/bulkpurchase"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"/>

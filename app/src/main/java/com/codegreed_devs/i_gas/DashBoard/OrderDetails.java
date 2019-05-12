@@ -1,6 +1,8 @@
 package com.codegreed_devs.i_gas.DashBoard;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -54,15 +56,42 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
                 //MOVED CODE TO POST CLIENT ORDER DETAILS TO MAPS ACTIVITY
                 if (validate())
                 {
-                    //go to order confirmation activity
-                    Intent intent = new Intent(OrderDetails.this, OrderPreviewActivity.class);
-                    intent.putExtra("Unique_Key", key);
-                    intent.putExtra("gasSize", gasSize);
-                    intent.putExtra("gasType", gasType);
-                    intent.putExtra("numberOfCylinders", numberOfCylinders);
-                    intent.putExtra("GasBrand", gasBrand);
-                    startActivity(intent);
-                    finish();
+
+                    //Alert dialog message
+                    String message = "Gas Size : " + gasSize + "\n";
+                    message += "Gas Type : " + gasType + "\n";
+                    message += "Number of Cylinders : " + numberOfCylinders + "\n";
+                    message += "Gas Brand : " + gasBrand + "\n";
+
+                    //show order details preview
+                    final AlertDialog.Builder alert = new AlertDialog.Builder(OrderDetails.this);
+                    alert.setTitle("Please Confirm Order!");
+                    alert.setMessage(message);
+                    alert.setCancelable(false);
+                    alert.setPositiveButton("Confirm order", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            //go to clientsMapsActivity
+                            Intent intent = new Intent(OrderDetails.this, FindVendorsActivity.class);
+                            intent.putExtra("Unique_Key", key);
+                            intent.putExtra("gasSize", gasSize);
+                            intent.putExtra("gasType", gasType);
+                            intent.putExtra("numberOfCylinders", numberOfCylinders);
+                            intent.putExtra("GasBrand", gasBrand);
+                            startActivity(intent);
+                            finish();
+
+                        }
+                    });
+                    alert.setNegativeButton("Edit Order", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    alert.show();
+
                 }
 
             }

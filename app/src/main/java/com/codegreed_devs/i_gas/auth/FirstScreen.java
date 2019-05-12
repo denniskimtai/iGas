@@ -1,8 +1,11 @@
 package com.codegreed_devs.i_gas.auth;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
@@ -12,37 +15,26 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
-public class FirstScreen extends AppCompatActivity {
+public class FirstScreen extends Activity {
 
-    private Button buttonLogin;
-    private Button buttonSignup;
+    //Duration of wait
+    private final int SPLASH_DISPLAY_LENGTH = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_screen);
 
-        buttonLogin = findViewById(R.id.buttonLogin);
-        buttonSignup = findViewById(R.id.buttonSignup);
-
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
+        //handler to start menu activity and close splash screen after 1000ms
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onClick(View v) {
-
-                Intent login = new Intent(FirstScreen.this, LoginActivity.class);
-                startActivity(login);
-                finish();
-
+            public void run() {
+                //Intent to start login activity
+                Intent intent = new Intent(FirstScreen.this, LoginActivity.class);
+                FirstScreen.this.startActivity(intent);
+                FirstScreen.this.finish();
             }
-        });
-
-        buttonSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signUp  = new Intent(FirstScreen.this, RegistrationActivity.class);
-                startActivity(signUp);
-                finish();
-            }
-        });
+        }, SPLASH_DISPLAY_LENGTH);
     }
+
 }

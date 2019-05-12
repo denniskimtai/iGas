@@ -39,4 +39,6 @@
     <string name="vendor_address">Vendor Adrress</string>
     <string name="find_vendor">Find Vendor</string>
     <string name="no_nearby_vendors">No nearby vendors</string>
+    <string name="Vendor_Distance">vendor_distance</string>
+    <string name="reset_instructions">Enter your email address below and follow the instructions sent to your email to reset your password.</string>
 </resources>

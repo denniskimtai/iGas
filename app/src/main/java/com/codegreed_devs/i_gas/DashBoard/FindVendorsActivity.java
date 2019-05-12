@@ -32,6 +32,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -67,6 +68,7 @@ public class FindVendorsActivity extends FragmentActivity{
     private ProgressBar loadVendors;
     private VendorsListAdapter adapter;
     private ArrayList<VendorModel> vendors;
+    private Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,7 @@ public class FindVendorsActivity extends FragmentActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         //initialize views
-        ListView vendorsList = (ListView) findViewById(R.id.vendors_list);
+
         loadVendors = (ProgressBar) findViewById(R.id.load_vendors);
 
         //initialize other variables
@@ -85,19 +87,12 @@ public class FindVendorsActivity extends FragmentActivity{
         vendors = new ArrayList<VendorModel>();
         adapter = new VendorsListAdapter(this, vendors);
 
-        //update ui
-        vendorsList.setAdapter(adapter);
+
 
         //method call
         getClosestVendors();
 
-        //handle item clicks
-        vendorsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                confirmOrder(vendors.get(i));
-            }
-        });
+
 
     }
 
@@ -134,14 +129,33 @@ public class FindVendorsActivity extends FragmentActivity{
                                                         Location vendorLocation = new Location(vendor_id);
                                                         vendorLocation.setLatitude(location.latitude);
                                                         vendorLocation.setLongitude(location.longitude);
-                                                        if (deliveryLocation.distanceTo(vendorLocation) < 1500.000)
+                                                        if (deliveryLocation.distanceTo(vendorLocation) < 5000)
                                                         {
+                                                            //save distance from vendor to customer
+                                                            int vendorDistance = (int) deliveryLocation.distanceTo(vendorLocation)/1000;
+
                                                             VendorModel vendor = new VendorModel(vendor_id,
                                                                     ds.child("business_name").getValue(String.class),
                                                                     ds.child("business_address").getValue(String.class),
-                                                                    ds.child("fcm_token").getValue(String.class));
+                                                                    ds.child("fcm_token").getValue(String.class),
+                                                                    vendorDistance);
                                                             vendors.add(vendor);
                                                         }
+
+                                                        //initialize views
+                                                        ListView vendorsList = (ListView) findViewById(R.id.vendors_list);
+
+                                                        //update ui
+                                                        vendorsList.setAdapter(adapter);
+
+                                                        //handle item clicks
+                                                        vendorsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                            @Override
+                                                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                                                confirmOrder(vendors.get(i));
+                                                            }
+                                                        });
+
                                                     }
                                                 }
                                                 @Override
@@ -154,10 +168,6 @@ public class FindVendorsActivity extends FragmentActivity{
                                         adapter.notifyDataSetChanged();
                                         loadVendors.setVisibility(View.GONE);
 
-                                        if (vendors.size() < 1)
-                                        {
-                                            findViewById(R.id.no_vendors).setVisibility(View.VISIBLE);
-                                        }
                                     }
 
                                     @Override
@@ -168,12 +178,12 @@ public class FindVendorsActivity extends FragmentActivity{
                                 });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(FindVendorsActivity.this, "There was a problem getting your location." +
-                                "\nCheck your GPS settings", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(FindVendorsActivity.this, "There was a problem getting your location." +
+                        "\nCheck your GPS settings", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 

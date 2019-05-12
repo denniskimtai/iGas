@@ -49,17 +49,15 @@
             android:value="@string/google_maps_key" />
 
         <activity android:name=".DashBoard.OrderDetails" />
-
-        <activity android:name=".DashBoard.FindVendorsActivity"/>
-
+        <activity android:name=".DashBoard.FindVendorsActivity" />
         <activity android:name=".OrderConfirmationActivity" />
+        <activity android:name=".ResetPasswordActivity" />
 
         <service
             android:name=".MyFirebaseMessagingService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".DashBoard.OrderPreviewActivity"></activity>
 
     </application>
 

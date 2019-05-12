@@ -43,8 +43,10 @@ public class VendorsListAdapter extends BaseAdapter {
         view = inflater.inflate(R.layout.vendor_list_item, viewGroup, false);
         TextView name = (TextView) view.findViewById(R.id.vendor_name);
         TextView address = (TextView) view.findViewById(R.id.vendor_address);
+        TextView vendorDistance = view.findViewById(R.id.vendor_distance);
         name.setText(vendors.get(i).getVendorName());
         address.setText(vendors.get(i).getVendorAddress());
+        vendorDistance.setText(vendors.get(i).getVendorDistance() + " km away");
         return view;
     }
 
