@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:layout_margin="5dp"
+        card_view:cardCornerRadius="5dp"
+        card_view:cardElevation="5dp"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            tools:context=".auth.RegistrationActivity">
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Order History"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="30sp"
+                    android:layout_marginTop="8dp"
+                    android:textAlignment="center"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Order Id"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="25sp"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/gasBrand"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Brand"
+                    android:textSize="20sp"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Brand"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="25sp"
+                    android:layout_marginTop="8dp"/>
+                <TextView
+                    android:id="@+id/gasSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Brand"
+                    android:textSize="20sp"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Size"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="25sp"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/gasType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Brand"
+                    android:layout_marginTop="8dp"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Type"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="25sp"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/numberOfCylinders"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Brand"
+                    android:layout_marginTop="8dp"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Order Status"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="25sp"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/orderStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Brand"
+                    android:layout_marginTop="8dp"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Number of Cylinders"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="25sp"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/orderId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gas Brand"
+                    android:layout_marginTop="8dp"
+                    android:textSize="20sp"/>
+
+            </LinearLayout>
+        </ScrollView>
+    </android.support.v7.widget.CardView>
+</RelativeLayout>
