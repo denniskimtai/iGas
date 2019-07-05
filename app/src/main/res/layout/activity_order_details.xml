@@ -55,6 +55,14 @@
                 android:onClick="gasSize"/>
 
             <RadioButton
+                android:id="@+id/gas6kg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="6 KG"
+                android:onClick="gasSize"/>
+
+            <RadioButton
                 android:id="@+id/gas13kg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,11 +71,19 @@
                 android:onClick="gasSize"/>
 
             <RadioButton
-                android:id="@+id/gas16kg"
+                android:id="@+id/gas225kg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="16 KG"
+                android:text="22.5 KG"
+                android:onClick="gasSize"/>
+
+            <RadioButton
+                android:id="@+id/gas50kg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="50 KG"
                 android:onClick="gasSize"/>
 
 

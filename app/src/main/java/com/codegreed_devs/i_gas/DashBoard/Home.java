@@ -34,8 +34,8 @@ public class Home extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //return layout file
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        //return alternate layout file
+        return inflater.inflate(R.layout.fragment_home, container,false);
     }
 
     @Override
@@ -44,6 +44,13 @@ public class Home extends Fragment {
         //Set toolbar title
         getActivity().setTitle("Home");
 
+        home();
+
+
+    }
+
+    //All methods for cardviews
+    private void home() {
 
         cardViewBuyGas = getActivity().findViewById(R.id.cardViewBuyGas);
         cardViewBuyGas.setOnClickListener(new View.OnClickListener() {

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -142,7 +143,16 @@ public class HomeActivity extends AppCompatActivity
         //Initialize clicked fragment objects
         switch (ItemId) {
             case R.id.nav_home:
-                fragment = new Home();
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    //Show alternate home screen for android versions below lollipop
+                    fragment = new HomeAlternate();
+                } else {
+
+                    //Show cardview home screen
+                    fragment = new Home();
+                }
+
                 break;
 
             case R.id.nav_profile:
@@ -161,7 +171,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_share:
                 Intent navShare = new Intent(Intent.ACTION_SEND);
                 navShare.setType("text/plain");
-                String shareMessage = "Google PlayStore link";
+                String shareMessage = "https://play.google.com/store/apps/details?id=com.codegreed_devs.i_gas";
                 navShare.putExtra(Intent.EXTRA_SUBJECT, "Follow this link to download iGas app");
                 navShare.putExtra(Intent.EXTRA_TEXT, shareMessage);
                 startActivity(Intent.createChooser(navShare, "Share Via"));
@@ -226,7 +236,7 @@ public class HomeActivity extends AppCompatActivity
                     case 0:
                         //Place a call
                         Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
-                        phoneIntent.setData(Uri.parse("tel:+254710265413"));
+                        phoneIntent.setData(Uri.parse("tel:+254713989734"));
                         startActivity(phoneIntent);
 
                         break;
@@ -235,7 +245,7 @@ public class HomeActivity extends AppCompatActivity
 
                         //Send an sms
                         Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-                        sendIntent.setData(Uri.parse("sms:" + "+254710265413"));
+                        sendIntent.setData(Uri.parse("sms:" + "+254726375757"));
                         startActivity(sendIntent);
 
                         break;

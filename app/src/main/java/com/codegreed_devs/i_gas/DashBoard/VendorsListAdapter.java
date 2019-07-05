@@ -46,7 +46,7 @@ public class VendorsListAdapter extends BaseAdapter {
         TextView vendorDistance = view.findViewById(R.id.vendor_distance);
         name.setText(vendors.get(i).getVendorName());
         address.setText(vendors.get(i).getVendorAddress());
-        vendorDistance.setText(vendors.get(i).getVendorDistance() + " km away");
+        vendorDistance.setText(vendors.get(i).getVendorDistance() + " meters away");
         return view;
     }
 

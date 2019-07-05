@@ -72,7 +72,7 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            //go to clientsMapsActivity
+                            //go to FindVendorsActivity
                             Intent intent = new Intent(OrderDetails.this, FindVendorsActivity.class);
                             intent.putExtra("Unique_Key", key);
                             intent.putExtra("gasSize", gasSize);
@@ -134,11 +134,17 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
     public void gasSize(View view){
         //Check if radiobutton is checked
         boolean isChecked = ((RadioButton) view ).isChecked();
-        //check with radio button is checked
+        //check which radio button is checked
         switch (view.getId()) {
             case R.id.gas3kg:
                 if (isChecked) {
                     gasSize = "3kg gas cylinder";
+                }
+                break;
+
+            case R.id.gas6kg:
+                if (isChecked) {
+                    gasSize = "6kg gas cylinder";
                 }
                 break;
 
@@ -148,9 +154,15 @@ public class OrderDetails extends AppCompatActivity implements AdapterView.OnIte
                 }
                 break;
 
-            case R.id.gas16kg:
+            case R.id.gas225kg:
                 if (isChecked) {
-                    gasSize = "16kg gas cylinder";
+                    gasSize = "22.5kg gas cylinder";
+                }
+                break;
+
+            case R.id.gas50kg:
+                if (isChecked) {
+                    gasSize = "50kg gas cylinder";
                 }
                 break;
         }
